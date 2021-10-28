@@ -20,8 +20,9 @@ class TestGenetic(unittest.TestCase):
         self.assertRaises(ValueError, find_best, population, ratings)
 
     def test_cross(self):
-        a = -1 # 11111
-        b = -12 # 10100
+        a = -1 #    11111
+        b = -12 #   10100
+        
         self.assertTrue(cross(a, b) in [[-4, -9], [-12, -1], [-4, -9], [-2, -11]])
 
 

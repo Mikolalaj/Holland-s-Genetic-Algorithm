@@ -14,9 +14,10 @@ def generate_random_population(size: int, min: int, max: int, dimension: int) ->
 
 if __name__ == '__main__':
     values = []
+    iters = []
     for i in range(25):
         minimalization = GeneticAlgorithm(
-            population=generate_random_population(50, -16, 15, 4),
+            population=generate_random_population(200, -16, 15, 4),
             mut_prob=0.2,
             cros_prob=0.9,
             max_iter=1000,
@@ -25,12 +26,14 @@ if __name__ == '__main__':
             print_info=False,
             assumed_min=(1, 3, 1, 1),
         )
-        result = minimalization.start()
-        values.append(result[1])
-        print(f'{i+1}. - {result[0]} - {result[1]}')
+        iter, point, value = minimalization.start()
+        values.append(value)
+        iters.append(iter)
+        print(f'{i+1}. - {point} - {value}')
     
-    print(f'Average = {sum(values)/len(values)}')
+    print(f'Average minimum = {sum(values)/len(values)}')
     print(f'Standard Deviation = {stdev(values)}')
+    print(f'Average iterations = {sum(iters)/len(iters)}')
 
 
 # minimum at (1, 3, 1, 1), f(x) = 0.9925037693693152

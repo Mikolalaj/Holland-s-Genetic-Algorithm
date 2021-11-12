@@ -47,7 +47,7 @@ class GeneticAlgorithm:
                     print(f'f(x) = {best_rating}')
             population = temp2
             i += 1
-        return best_x, best_rating
+        return i, best_x, best_rating
 
     def penalty_function(self, x: tuple) -> float:
         min = -16

@@ -1,19 +1,27 @@
 
 import random
-import math
 import numpy as np
 
 class GeneticAlgorithm:
-    def __init__(self, population: list, mut_prob: float, cros_prob: float, max_iter: int, pen_mul: float, chromosome_size: int, print_info: bool, assumed_min: tuple):
+    def __init__(self,
+        population: list,
+        mut_prob: float,
+        cros_prob: float,
+        max_iter: int,
+        pen_mul: float,
+        print_info: bool,
+        assumed_min: tuple,
+        function: callable
+    ):
         self.start_population = population
         self.pop_len = len(population)  # number of individuals in a population
         self.mut_prob = mut_prob  # mutation probability
         self.cros_prob = cros_prob  # crossover probability
         self.max_iter = max_iter  # max number of algorithm's iterations
         self.pen_mul = pen_mul  # penalty multiplier
-        self.chrom_size = chromosome_size # number of bits in chromosome
         self.print_info = print_info
         self.assumed_min = assumed_min
+        self.function = function
 
     def start(self) -> tuple:
         population = self.start_population
@@ -61,12 +69,7 @@ class GeneticAlgorithm:
         return abs(sum*self.pen_mul)
 
     def fitness_function(self, x: tuple) -> float:
-        function = (x[0]+2*x[1]-7)**2+(2*x[0]+x[1]-5)**2 + \
-            (math.sin(1.5*x[2]))**3 + \
-            ((x[2]-1)**2)*(1+(math.sin(1.5*x[3]))**2) + \
-            ((x[3]-1)**2)*(1+(x[3])**2)
-        penalty = self.penalty_function(x)
-        return function + penalty
+        return self.function(x) + self.penalty_function(x)
 
     def rate_population(self, population: list) -> list[float]:
         return [self.fitness_function(individual) for individual in population]
@@ -95,13 +98,24 @@ class GeneticAlgorithm:
         
         # normalize ratings to range [0.1 - 1]
         # 0.1 for the biggest rating, 1 for the smallest
-        probabilities = [(x-mx)/(mn-mx)+(0.1*(1-(x-mx)/(mn-mx))) for x in ratings]
+        if mn != mx:
+            probabilities = [(x-mx)/(mn-mx)+(0.1*(1-(x-mx)/(mn-mx))) for x in ratings]
         
-        return random.choices(population, probabilities, k=self.pop_len)
+            return random.choices(population, probabilities, k=self.pop_len)
+        else:
+            return population
 
     def crossover_mutation(self, population) -> list:
-        crossed_populaton = self.one_point_crossover(population)
-        mutated_population = self.mutation(crossed_populaton)
+        if self.cros_prob == 0:
+            crossed_populaton = population
+        else:
+            crossed_populaton = self.one_point_crossover(population)
+        
+        if self.mut_prob == 0:
+            mutated_population = crossed_populaton
+        else:
+            mutated_population = self.mutation(crossed_populaton)
+        
         return mutated_population
 
     def one_point_crossover(self, population) -> list:
